@@ -1,88 +1,31 @@
 <!doctype html>
-<!--
-Copyright 2016 The Chromium Authors. All rights reserved.
-Use of this source code is governed by a BSD-style license that can be
-found in the LICENSE file.
--->
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Hello VR</title>
+  <link rel="stylesheet" type="text/css" href="main.css" />
 
-    <!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://webvr.info, expires = 2018-02-07 -->
-<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-02-07" content="Al1y8MfH/kWdfrUyYm17Lxfm/qfbvWhUSinN3/0w8O3fdoEH0P10uCZ9+yTfQUjnyCIVlgBhbF7kF21cmv7nwQwAAABPeyJvcmlnaW4iOiJodHRwczovL3dlYnZyLmluZm86NDQzIiwiZmVhdHVyZSI6IldlYlZSMS4xTTYyIiwiZXhwaXJ5IjoxNTE4MDI1Mzk1fQ==">
+  <script src="js/third-party/wglu/wglu-url.js"></script>
 
-    <title>03 - VR Presentation</title>
+  <script src="js/third-party/gl-matrix-min.js"></script>
 
-    <!--
-      This sample demonstrates how to present the contents of a WebGL canvas to
-      a VRDisplay. The content is not mirrored on the main display while being
-      presented.
-    -->
+  <script src="js/third-party/wglu/wglu-program.js"></script>
+  <script src="js/third-party/wglu/wglu-stats.js"></script>
+  <script src="js/third-party/wglu/wglu-texture.js"></script>
 
-    <style>
-      #webgl-canvas, #presenting-message {
-        box-sizing: border-box;
-        height: 100%;
-        left: 0;
-        margin: 0;
-        position: absolute;
-        top: 0;
-        width: 100%;
-      }
-      #presenting-message {
-        color: white;
-        font-family: sans-serif;
-        font-size: 2em;
-        font-weight: bold;
-        z-index: 1;
-        text-align: center;
-        padding: 0.5em;
-        background-color: #444;
-        display: none;
-      }
-    </style>
+  <script src="js/vr-cube-sea.js"></script>
+  <script src="js/vr-samples-util.js"></script>
+</head>
 
-    <!-- This entire block in only to facilitate dynamically enabling and
-    disabling the WebVR polyfill, and is not necessary for most WebVR apps.
-    If you want to use the polyfill in your app, just include the js file and
-    everything will work the way you want it to by default. -->
-    <script src="js/third-party/webvr-polyfill.js"></script>
-    <script src="js/third-party/wglu/wglu-url.js"></script>
-    <script>
-      // Dynamically turn the polyfill on if requested by the query args.
-      if (WGLUUrl.getBool('polyfill', false)) {
-        var polyfill = new WebVRPolyfill({
-          // Ensures the polyfill is always active on mobile, due to providing
-          // a polyfilled CardboardVRDisplay when no native API is available,
-          // and also polyfilling even when the native API is available, due to
-          // providing a CardboardVRDisplay when no native VRDisplays exist.
-          PROVIDE_MOBILE_VRDISPLAY: true,
-          // Polyfill optimizations
-          DIRTY_SUBMIT_FRAME_BINDINGS: true,
-          BUFFER_SCALE: 0.75,
-        });
-      }
-    </script>
-    <!-- End sample polyfill enabling logic -->
-
-    <script src="js/third-party/gl-matrix-min.js"></script>
-
-    <script src="js/third-party/wglu/wglu-program.js"></script>
-    <script src="js/third-party/wglu/wglu-stats.js"></script>
-    <script src="js/third-party/wglu/wglu-texture.js"></script>
-
-    <script src="js/vr-cube-sea.js"></script>
-    <script src="js/vr-samples-util.js"></script>
-  </head>
-  <body>
-    <canvas id="webgl-canvas"></canvas>
-    <div id="presenting-message">Put on your headset now</div>
-    <script>
-      /* global mat4, VRCubeSea, WGLUStats, WGLUTextureLoader, VRSamplesUtil */
-      (function () {
+<body>
+  <canvas id="webgl-canvas"></canvas>
+  <div id="presenting-message">Put on your headset now</div>
+  <script>
+    /* global mat4, VRCubeSea, WGLUStats, WGLUTextureLoader, VRSamplesUtil */
+    (function () {
       "use strict";
 
       var vrDisplay = null;
@@ -102,22 +45,22 @@ found in the LICENSE file.
       var cubeSea = null;
       var stats = null;
 
-      function onContextLost( event ) {
+      function onContextLost(event) {
         event.preventDefault();
-        console.log( 'WebGL Context Lost.' );
+        console.log('WebGL Context Lost.');
         gl = null;
         cubeSea = null;
         stats = null;
       }
 
-      function onContextRestored( event ) {
-        console.log( 'WebGL Context Restored.' );
+      function onContextRestored(event) {
+        console.log('WebGL Context Restored.');
         initWebGL();
       }
 
       var webglCanvas = document.getElementById("webgl-canvas");
-      webglCanvas.addEventListener( 'webglcontextlost', onContextLost, false );
-      webglCanvas.addEventListener( 'webglcontextrestored', onContextRestored, false );
+      webglCanvas.addEventListener('webglcontextlost', onContextLost, false);
+      webglCanvas.addEventListener('webglcontextrestored', onContextRestored, false);
 
       function initWebGL() {
         var glAttribs = {
@@ -145,7 +88,7 @@ found in the LICENSE file.
         cubeSea = new VRCubeSea(gl, texture);
 
         var enablePerformanceMonitoring = WGLUUrl.getBool(
-            'enablePerformanceMonitoring', false);
+          'enablePerformanceMonitoring', false);
         stats = new WGLUStats(gl, enablePerformanceMonitoring);
 
         // Wait until we have a WebGL context to resize and start rendering.
@@ -159,7 +102,7 @@ found in the LICENSE file.
       // WebVR-specific code begins here.
       // ================================
 
-      function onVRRequestPresent () {
+      function onVRRequestPresent() {
         // This can only be called in response to a user gesture.
         vrDisplay.requestPresent([{ source: webglCanvas }]).then(function () {
           // Nothing to do because we're handling things in onVRPresentChange.
@@ -172,7 +115,7 @@ found in the LICENSE file.
         });
       }
 
-      function onVRExitPresent () {
+      function onVRExitPresent() {
         // No sense in exiting presentation if we're not actually presenting.
         // (This may happen if we get an event like vrdisplaydeactivate when
         // we weren't presenting.)
@@ -190,7 +133,7 @@ found in the LICENSE file.
         });
       }
 
-      function onVRPresentChange () {
+      function onVRPresentChange() {
         // When we begin or end presenting, the canvas should be resized to the
         // recommended dimensions for the display.
         onResize();
@@ -267,7 +210,7 @@ found in the LICENSE file.
         VRSamplesUtil.addError("Your browser does not support WebVR. See <a href='http://webvr.info'>webvr.info</a> for assistance.");
       }
 
-      function onResize () {
+      function onResize() {
         if (vrDisplay && vrDisplay.isPresenting) {
           // If we're presenting we want to use the drawing buffer size
           // recommended by the VRDevice, since that will ensure the best
@@ -294,7 +237,7 @@ found in the LICENSE file.
       // to the scene in response (so that we know it's working.) This basic
       // interaction mode is the baseline for all WebVR compatible devices, and
       // should ideally always be minimally supported.
-      function onClick () {
+      function onClick() {
         // Reset the background color to a random value
         if (gl) {
           gl.clearColor(
@@ -330,7 +273,7 @@ found in the LICENSE file.
       window.addEventListener('vrdisplaypointerrestricted', onDisplayPointerRestricted);
       window.addEventListener('vrdisplaypointerunrestricted', onDisplayPointerUnrestricted);
 
-      function onAnimationFrame (t) {
+      function onAnimationFrame(t) {
         // do not attempt to render if there is no available WebGL context
         if (!gl || !stats || !cubeSea) {
           return;
@@ -370,7 +313,7 @@ found in the LICENSE file.
             // account.
             gl.viewport(0, 0, webglCanvas.width, webglCanvas.height);
             // It's best to use our own projection matrix in this case, but we can use the left eye's view matrix
-            mat4.perspective(projectionMat, Math.PI*0.4, webglCanvas.width / webglCanvas.height, 0.1, 1024.0);
+            mat4.perspective(projectionMat, Math.PI * 0.4, webglCanvas.width / webglCanvas.height, 0.1, 1024.0);
             cubeSea.render(projectionMat, frameData.leftViewMatrix, stats, t);
             stats.renderOrtho();
           }
@@ -379,7 +322,7 @@ found in the LICENSE file.
 
           // No VRDisplay found.
           gl.viewport(0, 0, webglCanvas.width, webglCanvas.height);
-          mat4.perspective(projectionMat, Math.PI*0.4, webglCanvas.width / webglCanvas.height, 0.1, 1024.0);
+          mat4.perspective(projectionMat, Math.PI * 0.4, webglCanvas.width / webglCanvas.height, 0.1, 1024.0);
           mat4.identity(viewMat);
           cubeSea.render(projectionMat, viewMat, stats, t);
 
@@ -389,7 +332,8 @@ found in the LICENSE file.
         stats.end();
       }
       window.requestAnimationFrame(onAnimationFrame);
-      })();
-    </script>
-  </body>
+    })();
+  </script>
+</body>
+
 </html>

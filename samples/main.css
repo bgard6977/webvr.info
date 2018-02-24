@@ -1,0 +1,20 @@
+#webgl-canvas, #presenting-message {
+    box-sizing: border-box;
+    height: 100%;
+    left: 0;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+  #presenting-message {
+    color: white;
+    font-family: sans-serif;
+    font-size: 2em;
+    font-weight: bold;
+    z-index: 1;
+    text-align: center;
+    padding: 0.5em;
+    background-color: #444;
+    display: none;
+  }
